@@ -1,70 +1,50 @@
-# Cloudflare Deployment Guide (Workers & Pages)
+# Cloudflare Pages & GitHub Flat Static Deployment Guide
 
-This guide addresses the exact error shown in your Cloudflare dashboard build log and explains how to get your site live immediately.
-
----
-
-## 1. Why the Build Failed at the "Deploying" Step in Cloudflare
-
-From your Cloudflare dashboard screenshot:
-- **Project Type**: Cloudflare **Worker** (named `newsitekofy`).
-- **Deploy Command**: `npx wrangler deploy`
-- **What happened**: 
-  1. `Initializing`, `Cloning`, and `Installing` all succeeded.
-  2. `Building` ran `npm run build` (`node build.js`), which succeeded in 542ms.
-  3. **`Deploying` failed after 13s**: Cloudflare ran `npx wrangler deploy`. Because `wrangler.toml` was missing the `[assets]` configuration for the Worker and had an unmatched project name, Wrangler threw:
-     ```
-     [ERROR] Missing entry-point to Worker script or to assets directory
-     ```
+This repository contains a **100% pure flat static HTML/CSS/JS website**. It is built to deploy effortlessly to **Cloudflare Pages via GitHub** with **zero build commands**, **zero server-side code**, and **zero redirect conflicts**.
 
 ---
 
-## 2. What Was Fixed
+## 1. Flat Static Architecture
+- All pages live as standalone, independent files in the root directory:
+  - `index.html` (Home)
+  - `about.html` (About Eric Richson Darko)
+  - `ministry.html` (Ministry & Network)
+  - `agency.html` (Richson Creatives Agency)
+  - `library.html` (Bookshelf & Bookstore)
+  - `blognugget.html` (Daily Spiritual Nuggets)
+  - `contact.html` (Contact & Inquiries)
+- **Clean Relative URLs**: All internal links use clean standard paths (`href="/agency.html"`, `href="/about.html"`, etc.) with no trailing slashes.
+- **Dedicated Canonical Meta Tags**: Every individual page points to its own canonical URL (`/about.html`, `/agency.html`, etc.) rather than defaulting to `index.html`.
+- **No Worker / Redirect Conflicts**: No `wrangler.toml`, no `_redirects` file, and no server-side edge functions. This completely avoids `ERR_TOO_MANY_REDIRECTS` loops and Cloudflare Worker deploy errors.
 
-1. **Configured `wrangler.toml` for `newsitekofy` Workers Static Assets**:
-   ```toml
-   name = "newsitekofy"
-   compatibility_date = "2024-09-23"
+---
 
-   [assets]
-   directory = "./dist"
-   html_handling = "auto-trailing-slash"
-   not_found_handling = "none"
-   ```
-2. **Tested and Verified Locally**:
-   Running `npx wrangler deploy --dry-run` now completes with **0 errors and 0 warnings**:
-   ```
-   ✨ Read 26 files from the assets directory dist
-   Total Upload: 0.34 KiB / gzip: 0.25 KiB
-   No bindings found.
+## 2. Deploying on Cloudflare Pages via GitHub (1-Minute Setup)
+
+1. **Push your code to GitHub**:
+   ```bash
+   git add .
+   git commit -m "Refactor to flat standalone static files for Cloudflare Pages"
+   git push origin main
    ```
 
----
+2. **In Cloudflare Dashboard**:
+   - Navigate to **Workers & Pages** in the left menu.
+   - Click **Create** → Select the **Pages** tab (⚠️ **Select Pages, NOT Workers**).
+   - Click **Connect to Git** and choose repository: `richsoncreatives/richsonweb` (or your active repository).
 
-## 3. How to Deploy Now
+3. **Build & Deployment Settings**:
+   - **Framework preset**: `None`
+   - **Build command**: *(Leave blank)*
+   - **Build output directory**: `/` *(or leave as root)*
+   - Click **Save and Deploy**.
 
-### Option A: Retry the Build on Cloudflare (Easiest)
-1. Push these updated files to your GitHub repository (`richsoncreatives/newsitekofy` or `richsoncreatives/richsonweb`).
-2. Go back to your Cloudflare dashboard (the exact screen from your screenshot).
-3. Click the **"Retry build"** button in the top right.
-4. The deployment will complete successfully!
-
----
-
-### Option B: If Deploying to a Different Worker Name
-If you want to deploy to a Worker with a different name (e.g. `richsonwebsite` or `richsonweb` as seen in your left sidebar):
-1. In `wrangler.toml`, change `name = "newsitekofy"` to match your project name:
-   ```toml
-   name = "richsonwebsite"
-   ```
-2. Commit and push to GitHub.
+Cloudflare will deploy your static files in ~15 seconds.
 
 ---
 
-## 4. Connecting Your Custom Domain
-
-Once the deployment finishes:
-1. In the Cloudflare dashboard for `newsitekofy`, go to **Settings** > **Domains & Routes** (or **Custom Domains**).
-2. Click **Add** > **Custom Domain**.
-3. Enter your domain (e.g., `richsonericdarko.com` or `www.richsonericdarko.com`).
-4. Cloudflare provisions the DNS and SSL automatically.
+## 3. Connecting Your Custom Domain
+1. In your Cloudflare Pages project, click the **Custom domains** tab.
+2. Click **Set up a custom domain**.
+3. Enter your domain (e.g. `richsonericdarko.com` or `www.richsonericdarko.com`).
+4. Click **Continue** (Cloudflare activates automatic DNS and free SSL).

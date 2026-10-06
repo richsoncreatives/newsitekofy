@@ -39,6 +39,12 @@ for (const [route, file] of Object.entries(routeMap)) {
 // Serve all static assets from root
 app.use(express.static(__dirname));
 
+// Zip file direct download handler
+app.get(['/download', '/download-zip', '/richsonwebsite.zip'], (req, res) => {
+  const zipPath = path.join(__dirname, 'richsonwebsite.zip');
+  res.download(zipPath, 'richsonwebsite.zip');
+});
+
 // Form submission handler
 app.post(['/contact', '/contact.html', '/api/contact'], (req, res) => {
   res.json({ success: true, message: 'Thank you for your message. We will be in touch shortly.' });
