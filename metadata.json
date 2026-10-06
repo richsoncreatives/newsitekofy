@@ -1,0 +1,8 @@
+{
+  "name": "richsonweb",
+  "description": "Executive consulting, ministry, and authorship digital ecosystem offering professional portfolio management, e-commerce publishing, and daily spiritual wisdom.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
